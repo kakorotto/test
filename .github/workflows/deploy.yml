@@ -10,12 +10,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      pages: write
-      id-token: write
-    concurrency:
-      group: "pages"
-      cancel-in-progress: false
+      contents: write
     
     steps:
       - name: Checkout repository
@@ -25,16 +20,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
 
       - name: Install Angular CLI
         run: npm install -g @angular/cli@17
 
       - name: Install dependencies
         working-directory: ./frontend
-        run: |
-          npm install --legacy-peer-deps || npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Angular application
         working-directory: ./frontend
@@ -42,14 +34,10 @@ jobs:
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './frontend/dist/angular-frontend'
-
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/dist/angular-frontend
+          cname: false
