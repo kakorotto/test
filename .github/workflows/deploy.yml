@@ -20,7 +20,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          # Remove cache since we don't have package-lock.json
 
       - name: Install Angular CLI
         run: npm install -g @angular/cli@17
